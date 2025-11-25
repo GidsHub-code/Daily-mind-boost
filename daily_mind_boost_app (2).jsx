@@ -1,127 +1,197 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Sun, Gift, PenLine, BookOpen, User, Edit3, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safe Downloader</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: var(--bg);
+        color: var(--text);
+        transition: 0.3s ease;
+    }
+    :root {
+        --bg: #ffffff;
+        --text: #000;
+        --card: #f0f0f0;
+    }
+    .dark {
+        --bg: #121212;
+        --text: #fff;
+        --card: #1f1f1f;
+    }
+    .container {
+        max-width: 500px;
+        margin: auto;
+        padding: 20px;
+        background: var(--card);
+        border-radius: 15px;
+    }
+    input, button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        border-radius: 10px;
+        border: none;
+    }
+    button {
+        background: #0084ff;
+        color: white;
+        font-size: 16px;
+    }
+    #progressBar {
+        width: 100%;
+        height: 12px;
+        background: #ccc;
+        border-radius: 10px;
+        margin-top: 15px;
+        overflow: hidden;
+    }
+    #progress {
+        height: 100%;
+        width: 0%;
+        background: #00cc66;
+        transition: width 0.2s;
+    }
+    .history {
+        margin-top: 20px;
+        padding: 10px;
+    }
+    .history-item {
+        background: var(--bg);
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    .toggle {
+        padding: 10px;
+        cursor: pointer;
+        margin-bottom: 15px;
+        background: #444;
+        color: white;
+        width: 120px;
+        text-align: center;
+        border-radius: 10px;
+    }
+</style>
+</head>
+<body>
 
-export default function DailyMindBoost() {
-  const [quotes, setQuotes] = useState([]);
-  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
-  const [activeScreen, setActiveScreen] = useState("home");
-  const [reflection, setReflection] = useState(() => localStorage.getItem("reflection") || "");
-  const [themeUnlocked, setThemeUnlocked] = useState(false);
+<div class="container">
+    <div class="toggle" onclick="toggleDarkMode()">Dark Mode</div>
 
-  useEffect(() => {
-    fetch("https://type.fit/api/quotes")
-      .then((res) => res.json())
-      .then((data) => {
-        const filtered = data.filter((quote) => quote.text.length < 120);
-        setQuotes(filtered.slice(0, 10));
-      });
-  }, []);
+    <h2>Safe Downloader</h2>
 
-  const handleNextQuote = () => {
-    setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
-  };
+    <input type="text" id="url" placeholder="Enter direct download link...">
 
-  const handleSaveReflection = () => {
-    localStorage.setItem("reflection", reflection);
-    alert("Reflection saved!");
-  };
+    <button onclick="startDownload()">Download</button>
 
-  const handleUnlockTheme = () => {
-    alert("Watch a rewarded ad to unlock this theme!");
-    // Simulate ad success
-    setTimeout(() => setThemeUnlocked(true), 2000);
-  };
-
-  const currentQuote = quotes[currentQuoteIndex]?.text || "Loading inspirational quote...";
-
-  const screenVariants = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 },
-  };
-
-  return (
-    <div className={`min-h-screen transition-colors duration-500 ${themeUnlocked ? "bg-yellow-50" : "bg-gradient-to-b from-indigo-100 to-white"} p-6 flex flex-col items-center`}>
-      <div className="flex justify-between w-full max-w-md mb-4 gap-2">
-        <Button variant="ghost" onClick={() => setActiveScreen("home")}>Home</Button>
-        <Button variant="ghost" onClick={() => setActiveScreen("explore")}> <BookOpen className="w-5 h-5 mr-1" /> Explore </Button>
-        <Button variant="ghost" onClick={() => setActiveScreen("reflect")}> <Edit3 className="w-5 h-5 mr-1" /> Reflect </Button>
-        <Button variant="ghost" onClick={() => setActiveScreen("profile")}> <User className="w-5 h-5 mr-1" /> Profile </Button>
-      </div>
-
-      <AnimatePresence mode="wait">
-        {activeScreen === "home" && (
-          <motion.div key="home" {...screenVariants} initial="initial" animate="animate" exit="exit" className="w-full max-w-md">
-            <h1 className="text-2xl font-bold mb-4 text-indigo-700">Good Morning, Sarah!</h1>
-
-            <Card className="shadow-xl mb-4">
-              <CardContent className="p-6 text-center">
-                <p className="text-lg italic text-gray-700">"{currentQuote}"</p>
-              </CardContent>
-            </Card>
-
-            <div className="flex gap-4 mb-6">
-              <Button variant="outline" className="flex gap-2" onClick={handleNextQuote}>
-                <Sun className="w-4 h-4" /> Next Quote
-              </Button>
-              <Button variant="outline" className="flex gap-2" onClick={() => setActiveScreen("reflect")}> 
-                <PenLine className="w-4 h-4" /> Reflect
-              </Button>
-              <Button variant="default" className="flex gap-2" onClick={handleUnlockTheme}>
-                <Gift className="w-4 h-4" /> Unlock More
-              </Button>
-            </div>
-
-            <div className="rounded-xl shadow bg-gray-100 p-4 text-center text-sm text-gray-500">
-              [Ad Banner Placeholder]
-            </div>
-          </motion.div>
-        )}
-
-        {activeScreen === "explore" && (
-          <motion.div key="explore" {...screenVariants} initial="initial" animate="animate" exit="exit" className="w-full max-w-md mt-4">
-            <h2 className="text-xl font-semibold text-indigo-600 mb-2">Explore Quotes</h2>
-            <div className="grid gap-3">
-              {quotes.map((quote, index) => (
-                <Card key={index}>
-                  <CardContent className="p-4 text-sm text-gray-700 italic">"{quote.text}"</CardContent>
-                </Card>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {activeScreen === "reflect" && (
-          <motion.div key="reflect" {...screenVariants} initial="initial" animate="animate" exit="exit" className="w-full max-w-md mt-4">
-            <h2 className="text-xl font-semibold text-indigo-600 mb-2">Reflection Journal</h2>
-            <textarea
-              className="w-full h-32 p-4 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
-              placeholder="Write a quick reflection here..."
-              value={reflection}
-              onChange={(e) => setReflection(e.target.value)}
-            />
-            <Button className="mt-3 w-full" onClick={handleSaveReflection}>Save Reflection</Button>
-          </motion.div>
-        )}
-
-        {activeScreen === "profile" && (
-          <motion.div key="profile" {...screenVariants} initial="initial" animate="animate" exit="exit" className="w-full max-w-md mt-4">
-            <h2 className="text-xl font-semibold text-indigo-600 mb-2">Profile Settings</h2>
-            <div className="p-4 bg-white rounded-xl shadow text-sm text-gray-600">
-              {themeUnlocked ? (
-                <div className="flex items-center gap-2 text-green-600">
-                  <Sparkles className="w-4 h-4" /> Theme Unlocked!
-                </div>
-              ) : (
-                "Coming soon: Reminder settings, theme preferences, and more!"
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div id="progressBar">
+        <div id="progress"></div>
     </div>
-  );
-}
+
+    <p id="status">Status: Idle</p>
+
+    <h3>Download History</h3>
+    <div class="history" id="history"></div>
+</div>
+
+<script>
+    // Restore dark mode
+    if (localStorage.getItem("dark") === "true") {
+        document.body.classList.add("dark");
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark");
+        localStorage.setItem("dark", document.body.classList.contains("dark"));
+    }
+
+    function startDownload() {
+        let url = document.getElementById("url").value.trim();
+        let status = document.getElementById("status");
+        let progress = document.getElementById("progress");
+
+        if (!url) {
+            status.textContent = "Please enter a valid URL.";
+            return;
+        }
+
+        if (url.includes("youtube.com") || url.includes("youtu.be")) {
+            status.textContent = "YouTube downloading is not allowed.";
+            return;
+        }
+
+        status.textContent = "Downloading...";
+
+        // XMLHttpRequest for progress bar
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.responseType = "blob";
+
+        xhr.onprogress = function (event) {
+            if (event.lengthComputable) {
+                let percent = Math.floor((event.loaded / event.total) * 100);
+                progress.style.width = percent + "%";
+            }
+        };
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                let blob = xhr.response;
+                let a = document.createElement("a");
+                a.href = window.URL.createObjectURL(blob);
+                a.download = url.split("/").pop();
+                a.click();
+
+                saveHistory(a.download);
+
+                status.textContent = "Download complete ✔️";
+                progress.style.width = "100%";
+            } else {
+                status.textContent = "Failed to download file.";
+            }
+        };
+
+        xhr.onerror = function () {
+            status.textContent = "Network error.";
+        };
+
+        xhr.send();
+    }
+
+    function saveHistory(fileName) {
+        let history = JSON.parse(localStorage.getItem("dlHistory") || "[]");
+
+        history.unshift({
+            file: fileName,
+            date: new Date().toLocaleString()
+        });
+
+        localStorage.setItem("dlHistory", JSON.stringify(history));
+        loadHistory();
+    }
+
+    function loadHistory() {
+        let historyBox = document.getElementById("history");
+        let history = JSON.parse(localStorage.getItem("dlHistory") || "[]");
+
+        historyBox.innerHTML = "";
+
+        history.forEach(item => {
+            let div = document.createElement("div");
+            div.className = "history-item";
+            div.textContent = `${item.file} — (${item.date})`;
+            historyBox.appendChild(div);
+        });
+    }
+
+    loadHistory();
+</script>
+
+</body>
+</html>            
